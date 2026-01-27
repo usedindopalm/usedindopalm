@@ -122,6 +122,31 @@ border-radius:8px;
 cursor:pointer;
 }
 
+.gallery-slider{
+width:100%;
+max-width:900px;
+margin:auto;
+position:relative;
+overflow:hidden;
+border-radius:14px;
+height:450px;
+}
+
+.gallery-slider img{
+width:100%;
+height:100%;
+object-fit:cover;
+position:absolute;
+top:0;
+left:0;
+opacity:0;
+transition:opacity 1s ease;
+}
+
+.gallery-slider img.active{
+opacity:1;
+}
+
 </style>
 </head>
 
@@ -146,6 +171,8 @@ cursor:pointer;
 <a href="#market">Market</a>
 <a href="#inquiry">RFQ</a>
 <a href="#contact">Contact</a>
+<a href="#gallery">Gallery</a>
+
 </nav>
 
 <section id="about">
@@ -285,6 +312,24 @@ Our product is suitable for various industrial and energy applications worldwide
 </div>
 </section>
 
+<section id="gallery">
+<div class="card">
+<h2>Product Gallery | 产品展示</h2>
+
+<div class="gallery-slider">
+  <img class="gslide active" src="https://images.unsplash.com/photo-1602526216035-6fce8c5b4a06">
+  <img class="gslide" src="https://images.unsplash.com/photo-1611270629569-5a7f8f8c9bfa">
+  <img class="gslide" src="https://images.unsplash.com/photo-1581090700227-1e37b190418e">
+  <img class="gslide" src="https://images.unsplash.com/photo-1617957743095-d7f80c7e7f3b">
+</div>
+
+<p style="margin-top:15px;text-align:center;">
+Bulk Used CPO loading, storage tank, and shipping process.
+</p>
+
+</div>
+</section>
+
 <section id="inquiry">
 <div class="card">
 <h2>Request for Quotation</h2>
@@ -344,9 +389,22 @@ document.getElementById("wechatPopup").style.display="block";
 function closeWechat(){
 document.getElementById("wechatPopup").style.display="none";
 }
+// GALLERY SLIDESHOW
+let gIndex = 0;
+const gSlides = document.querySelectorAll(".gslide");
+
+function showGallery(){
+gSlides.forEach(slide => slide.classList.remove("active"));
+gSlides[gIndex].classList.add("active");
+gIndex = (gIndex + 1) % gSlides.length;
+}
+
+setInterval(showGallery,4000);
+
 </script>
 
 </body>
 </html>
+
 
 
