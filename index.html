@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Used CPO Bioenergy Supplier Indonesia</title>
+<title>Uco Bioenergy Supplier Indonesia</title>
 <meta name="description" content="Indonesia exporter of Used Crude Palm Oil (Used CPO) for bioenergy, renewable fuel, industrial boiler and power plant application.">
 
 <!-- Google Analytics -->
@@ -25,13 +25,67 @@ gtag('config','G-XXXXXXX');
 body{background:#eef6f1;color:#222;}
 
 /* HEADER SLIDER */
-header{height:90vh;position:relative;overflow:hidden;color:#fff;}
-.slide{position:absolute;width:100%;height:100%;background-size:cover;background-position:center;animation:slide 15s infinite;}
-.slide:nth-child(1){background-image:url("projek2.jpg");animation-delay:5s;}
-.slide:nth-child(2){background-image:url("projek1.jpg");animation-delay:5s;}
-.slide:nth-child(3){background-image:url("https://images.unsplash.com/photo-1509395176047-4a66953fd231");animation-delay:5s;}
-.slide:nth-child(4){background-image:url("https://images.unsplash.com/photo-1473341304170-971dccb5ac1e");animation-delay:5s;}
-.slide:nth-child(5){background-image:url("projek3.jpg");animation-delay:5s;}
+<header>
+  <div class="slide"></div>
+  <div class="slide"></div>
+  <div class="slide"></div>
+  <div class="slide"></div>
+  <div class="slide"></div>
+
+  <div class="header-content">
+     <h1>Used CPO Bioenergy Supplier</h1>
+     <p>Renewable Fuel From Indonesia</p>
+  </div>
+</header>
+
+/* Semua slide */
+.slide{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background-size:cover;
+  background-position:center;
+  opacity:0;
+  animation:fadeSlide 25s infinite;
+}
+
+/* Urutan Gambar (Story Flow) */
+.slide:nth-child(1){
+  background-image:url("projek1.jpg"); /* Pengumpulan minyak di restoran */
+  animation-delay:0s;
+}
+
+.slide:nth-child(2){
+  background-image:url("projek2.jpg"); /* Pengumpulan dari kampung */
+  animation-delay:5s;
+}
+
+.slide:nth-child(3){
+  background-image:url("projek3.jpg"); /* Penyimpanan / drum */
+  animation-delay:10s;
+}
+
+.slide:nth-child(4){
+  background-image:url("https://images.unsplash.com/photo-1509395176047-4a66953fd231");
+  animation-delay:15s; /* Proses bioenergy */
+}
+
+.slide:nth-child(5){
+  background-image:url("https://images.unsplash.com/photo-1473341304170-971dccb5ac1e");
+  animation-delay:20s; /* Power plant / energi */
+}
+
+/* Animasi Fade */
+@keyframes fadeSlide{
+  0%{opacity:0;}
+  10%{opacity:1;}
+  30%{opacity:1;}
+  40%{opacity:0;}
+  100%{opacity:0;}
+}
+
   
 @keyframes slide{
 0%{opacity:0}
@@ -407,6 +461,7 @@ setInterval(showGallery,4000);
 
 </body>
 </html>
+
 
 
 
