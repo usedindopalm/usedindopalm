@@ -628,4 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     fetchLatestEnergyNews();
+
+    // Auto-update news every hour (3600000 ms)
+    setInterval(fetchLatestEnergyNews, 3600000);
 });

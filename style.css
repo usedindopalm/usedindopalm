@@ -598,9 +598,9 @@ body {
 
 .news-modal img {
     width: 100%;
-    height: 450px;
+    height: 480px;
     object-fit: cover;
-    border-bottom: 2px solid var(--primary-gold);
+    border-bottom: 4px solid var(--primary-gold);
 }
 
 .news-modal .modal-body {
@@ -608,11 +608,12 @@ body {
 }
 
 .news-modal h2 {
-    color: var(--white);
-    font-size: 2.2rem;
+    color: var(--text-main);
+    font-size: 2.5rem;
     line-height: 1.2;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     font-family: 'Outfit', sans-serif;
+    font-weight: 800;
 }
 
 .line-accent {
@@ -624,10 +625,11 @@ body {
 }
 
 .news-modal #news-modal-text {
-    color: #ccc;
-    line-height: 1.8;
-    font-size: 1.1rem;
+    color: var(--text-muted);
+    line-height: 1.9;
+    font-size: 1.15rem;
     white-space: pre-wrap;
+    text-align: justify;
 }
 
 .modal-meta {
@@ -647,7 +649,7 @@ body {
 }
 
 .news-modal::-webkit-scrollbar-track {
-    background: #000;
+    background: var(--dark-surface);
 }
 
 .news-modal::-webkit-scrollbar-thumb {
