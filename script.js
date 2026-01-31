@@ -351,53 +351,95 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Gallery Logic
+    // Supabase Configuration
+    console.log("Gallery Script v1.1 Active");
+    const supabaseUrl = 'https://pdzvwgbobalrwajpbfzq.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkenZ3Z2JvYmFscndhanBiZnpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MDM2NDksImV4cCI6MjA4NTM3OTY0OX0.l48__vGwQluoOkyrcU-lOQOfAHRAxM-4Ga3MX4pPJdA';
+    const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+    // Gallery Logic (Live Sync & Compression)
     const galleryGrid = document.getElementById('gallery-grid');
     const photoUpload = document.getElementById('photo-upload');
-    const GALLERY_STORAGE_KEY = 'uco_gallery_images';
 
-    function createGalleryItem(src) {
+    const defaultImages = [
+        'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=800',
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800',
+        'https://images.unsplash.com/photo-1466611653911-95282fc3656b?q=80&w=800',
+        'https://images.unsplash.com/photo-1541888946425-d81bb19240f2?q=80&w=800',
+        'https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=800',
+        'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=800'
+    ];
+
+    function createGalleryItem(src, dbId = null) {
         if (!galleryGrid) return;
         const div = document.createElement('div');
         div.className = 'gallery-item fade-in-section visible';
         div.innerHTML = `
             <img src="${src}" alt="Gallery" onerror="this.src='https://placehold.co/600x400?text=Photo+Missing'">
-            <button class="delete-btn" onclick="deleteImage(this)"><i class="fa-solid fa-trash"></i></button>
+            <button class="delete-btn" onclick="deleteImage(this, ${dbId})"><i class="fa-solid fa-trash"></i></button>
         `;
         galleryGrid.appendChild(div);
     }
 
-    window.deleteImage = function (btn) {
-        if (confirm('Delete this photo?')) {
-            const img = btn.parentElement.querySelector('img').src;
-            let images = JSON.parse(localStorage.getItem(GALLERY_STORAGE_KEY)) || [];
-            localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(images.filter(s => s !== img)));
-            btn.parentElement.remove();
+    window.deleteImage = async function (btn, dbId) {
+        if (!confirm('Hapus foto ini secara permanen untuk semua pengunjung?')) return;
+        if (supabase && dbId) {
+            await supabase.from('gallery_images').delete().eq('id', dbId);
         }
+        btn.parentElement.remove();
     };
 
-    if (galleryGrid) {
-        const saved = JSON.parse(localStorage.getItem(GALLERY_STORAGE_KEY)) || [
-            'uploaded_media_0_1769634290687.jpg',
-            'uploaded_media_1_1769634290687.jpg',
-            'uploaded_media_2_1769634290687.jpg',
-            'uploaded_media_3_1769634290687.jpg'
-        ];
-        saved.forEach(createGalleryItem);
+    async function loadGallery() {
+        if (!galleryGrid) return;
+        if (supabase) {
+            const { data, error } = await supabase.from('gallery_images').select('*').order('created_at', { ascending: false });
+            if (!error) {
+                galleryGrid.innerHTML = '';
+                if (data && data.length > 0) {
+                    data.forEach(item => createGalleryItem(item.image_data, item.id));
+                }
+                // Jika data kosong (length 0), galeri akan tetap kosong sesuai keinginan Anda
+                return;
+            }
+        }
+        // Hanya tampilkan foto default jika terjadi ERROR koneksi ke database
+        galleryGrid.innerHTML = '';
+        defaultImages.forEach(src => createGalleryItem(src));
+    }
+
+    if (galleryGrid) loadGallery();
+
+    function compressImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+            };
+        });
     }
 
     if (photoUpload) {
-        photoUpload.addEventListener('change', (e) => {
-            Array.from(e.target.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const images = JSON.parse(localStorage.getItem(GALLERY_STORAGE_KEY)) || [];
-                    images.push(ev.target.result);
-                    localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(images));
-                    createGalleryItem(ev.target.result);
-                };
-                reader.readAsDataURL(file);
-            });
+        photoUpload.addEventListener('change', async (e) => {
+            for (const file of e.target.files) {
+                const compressedBase64 = await compressImage(file);
+                if (supabase) {
+                    const { data, error } = await supabase.from('gallery_images').insert([{ image_data: compressedBase64 }]).select();
+                    if (!error && data) loadGallery();
+                    else alert("Gagal upload ke Database.");
+                }
+            }
         });
     }
 
