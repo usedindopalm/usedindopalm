@@ -518,16 +518,34 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show placeholders initially
         newsTrack.innerHTML = Array(6).fill('<div class="skeleton-card skeleton"></div>').join('');
 
-        try {
-            const rssUrl = encodeURIComponent('https://zonaebt.com/feed/');
-            const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
-            const data = await response.json();
+        const sources = [
+            'https://zonaebt.com/feed/',
+            'https://www.mongabay.co.id/tag/energi-terbarukan/feed/',
+            'https://iesr.or.id/feed'
+        ];
 
-            if (data.status === 'ok' && data.items.length > 0) {
-                renderNewsCards(data.items);
+        let allNews = [];
+
+        for (const source of sources) {
+            try {
+                const rssUrl = encodeURIComponent(source);
+                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
+                const data = await response.json();
+                if (data.status === 'ok' && data.items.length > 0) {
+                    allNews = [...allNews, ...data.items];
+                }
+            } catch (err) {
+                console.warn(`Source ${source} failed, trying next...`);
             }
-        } catch (error) {
-            console.error('News auto-update failed:', error);
+        }
+
+        if (allNews.length > 0) {
+            // Sort by date and remove duplicates by title
+            const uniqueNews = Array.from(new Set(allNews.map(a => a.title)))
+                .map(title => allNews.find(a => a.title === title))
+                .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+            renderNewsCards(uniqueNews);
         }
     }
 
@@ -541,8 +559,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const pubDate = new Date(item.pubDate);
             const isNew = (new Date() - pubDate) < (48 * 60 * 60 * 1000); // 48h
-            const category = item.categories?.[0] || 'UCO Insight';
-            const displayTitle = item.title.replace(/zonaebt|zona ebt/gi, '').trim();
+            const category = item.categories?.[0] || 'Bioenergy Update';
+            const displayTitle = item.title.replace(/zonaebt|zona ebt|mongabay|iesr/gi, '').trim();
             const dateStr = pubDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
             const words = (item.content || item.description || "").split(' ').length;
             const readTime = Math.ceil(words / 200) + " min read";
